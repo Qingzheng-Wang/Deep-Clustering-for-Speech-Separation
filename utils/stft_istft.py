@@ -1,19 +1,18 @@
 import sys
 sys.path.append('../')
 
-import torch
 import librosa
 import numpy as np
 from utils import util
 
 class STFT(object):
-    '''
+    """
        using the librosa implement of stft
        windows: a window function
        nfft: length of the windowed signal after padding with zeros.
-       window_length: window() of length win_length 
+       window_length: window() of length win_length
        hop_length: number of audio samples between adjacent STFT columns.
-    '''
+    """
 
     def __init__(self, window='hann', nfft=256, window_length=256, hop_length=64,center=False):
         self.window = window
@@ -21,6 +20,7 @@ class STFT(object):
         self.window_length = window_length
         self.hop_length = hop_length
         self.center =center
+
     def stft(self, samp, is_mag=False,is_log=False):
         # is_mag: Whether the output is an amplitude value
         stft_r = librosa.stft(samp, n_fft=self.nfft, hop_length=self.hop_length,

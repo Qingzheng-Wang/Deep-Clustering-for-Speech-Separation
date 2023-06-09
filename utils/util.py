@@ -66,11 +66,12 @@ def read_scp(scp_file):
 
 
 def compute_non_silent(samp, threshold=40, is_linear=True):
-    '''
+    """
+       compute the non-silent mask
        samp: Spectrogram
        threshold: threshold(dB)
        is_linear: non-linear -> linear
-    '''
+    """
     # to linear first if needed
     if is_linear:
         samp = np.exp(samp)
@@ -78,11 +79,12 @@ def compute_non_silent(samp, threshold=40, is_linear=True):
     spectra_db = 20 * np.log10(samp)
     max_magnitude_db = np.max(spectra_db)
     threshold = 10**((max_magnitude_db - threshold) / 20)
-    non_silent = np.array(samp > threshold, dtype=np.float32)
+    non_silent = np.array(samp > threshold, dtype=np.float32)  # [T, F] 非静音的地方为1，静音的地方为0
     return non_silent
 
 def compute_cmvn(scp_file,save_file,**kwargs):
-    '''
+    """
+    cvmn是一种特征归一化的方法，对于每个特征维度，减去均值，除以方差
        Feature normalization
        scp_file: the file path of scp
        save_file: the cmvn result file .ark
@@ -91,33 +93,36 @@ def compute_cmvn(scp_file,save_file,**kwargs):
        return
             mean: [frequency-bins]
             var:  [frequency-bins]
-    '''
+    """
     wave_reader = AudioData(scp_file,**kwargs)
     tf_bin = int(kwargs['nfft']/2+1)
     mean = np.zeros(tf_bin)
     std = np.zeros(tf_bin)
     num_frames = 0
-    for spectrogram in tqdm(wave_reader):
-        num_frames += spectrogram.shape[0]
+    # 求整个数据集的均值和方差
+    for spectrogram in tqdm(wave_reader): # tqdm is a progress bar
+        num_frames += spectrogram.shape[0] # the first dimension of spectrogram is the number of frames
         mean += np.sum(spectrogram, 0)
         std += np.sum(spectrogram**2, 0)
     mean = mean / num_frames
-    std = np.sqrt(std / num_frames - mean**2)
+    std = np.sqrt(std / num_frames - mean**2) # 方差是平方的期望减去期望的平方
     with open(save_file, "wb") as f:
         cmvn_dict = {"mean": mean, "std": std}
-        pickle.dump(cmvn_dict, f)
+        pickle.dump(cmvn_dict, f) # 将cmvn_dict保存到f中,
+        # pickle是python中的序列化模块，将对象转化为字节流，方便存储和传输, dump是将对象序列化后存储到文件中
     print("Totally processed {} frames".format(num_frames))
     print("Global mean: {}".format(mean))
     print("Global std: {}".format(std))
     
 def apply_cmvn(samp,cmvn_dict):
-    '''
+    """
+
       apply cmvn for Spectrogram
       samp: stft Spectrogram
       cmvn: the path of cmvn(python util.py)
 
       calculate: x = (x-mean)/std
-    '''
+    """
     return (samp-cmvn_dict['mean'])/cmvn_dict['std']
 
 if __name__ == "__main__":
