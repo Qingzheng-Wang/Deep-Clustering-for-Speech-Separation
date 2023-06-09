@@ -6,7 +6,7 @@ def get_timestamp():
 
 
 def setup_logger(logger_name, root, level=logging.INFO, screen=False, tofile=False):
-    '''set up logger'''
+    """set up logger"""
     lg = logging.getLogger(logger_name)
     formatter = logging.Formatter('%(asctime)s [%(pathname)s:%(lineno)s - %(levelname)s ] %(message)s',
                                   datefmt='%y-%m-%d %H:%M:%S')

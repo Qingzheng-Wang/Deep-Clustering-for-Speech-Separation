@@ -25,7 +25,7 @@ class dataset(Dataset):
         key = self.keys[index]
         if key not in self.keys:
             raise ValueError
-        return (self.mix_reader[key], [target[key] for target in self.target_readers])
+        return self.mix_reader[key], [target[key] for target in self.target_readers]
 
 
 class dataloader(object):

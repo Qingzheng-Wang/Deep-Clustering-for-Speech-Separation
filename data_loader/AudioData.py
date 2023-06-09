@@ -8,12 +8,12 @@ import torch
 
 
 class AudioData(object):
-    '''
+    """
         Loading wave file
         scp_file: the scp file path
         other kwargs is stft's kwargs
         is_mag: if True, abs(stft)
-    '''
+    """
 
     def __init__(self, scp_file, window='hann', nfft=256, window_length=256, hop_length=64, center=False, is_mag=True, is_log=True):
         self.wave = ut.read_scp(scp_file)

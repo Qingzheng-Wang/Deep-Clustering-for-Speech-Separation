@@ -4,26 +4,25 @@ from utils import util
 import torch
 
 
-
 class Loss(object):
     def __init__(self, mix_wave, target_waves, non_slient, num_spks):
         super(Loss).__init__()
         self.mix_wave = mix_wave
         self.target_waves = target_waves
         self.non_slient = non_slient
-        self.num_spks = num_spks
+        self.num_spks = num_spks # number of speakers
         self.device = torch.device('cuda:0')
 
     def loss(self):
-        '''
+        """
            mix_wave: B x TF x D
            target_waves: B x T x F
-           non_slient: B x T x F 
-        '''
+           non_slient: B x T x F
+        """
         B, T, F = self.non_slient.shape
         
-        # B x TF x spks
-        target_embs = torch.zeros([B, T*F, self.num_spks],device=self.device)
+        # B x TF x spks, target_embs is th Y in the paper
+        target_embs = torch.zeros([B, T*F, self.num_spks], device=self.device)
         
         target_embs.scatter_(2, self.target_waves.view(B, T*F, 1), 1)
         

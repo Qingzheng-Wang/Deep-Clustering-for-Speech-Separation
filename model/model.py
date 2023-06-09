@@ -3,9 +3,9 @@ import torch.nn as nn
 from torch.nn.utils.rnn import pad_packed_sequence,pack_sequence,pad_sequence
 
 class DPCL(nn.Module):
-    '''
+    """
         Implement of Deep Clustering
-    '''
+    """
 
     def __init__(self, num_layer=2, nfft=129, hidden_cells=600, emb_D=40, dropout=0.0, bidirectional=True, activation="Tanh"):
         super(DPCL, self).__init__()
@@ -14,23 +14,24 @@ class DPCL(nn.Module):
                              dropout=dropout, bidirectional=bidirectional)
         self.dropout = nn.Dropout(dropout)
         self.activation = getattr(torch.nn, activation)()
-        self.linear = nn.Linear(2*hidden_cells if bidirectional else hidden_cells, nfft * emb_D)
+        self.linear = nn.Linear(2*hidden_cells if bidirectional else hidden_cells, nfft*emb_D)
         self.D = emb_D
     def forward(self, x, is_train=True):
-        '''
-           input: 
-                  for train: B x T x F
+        """
+           input:
+                  for train: B x T x F B is Batch
                   for test: T x F
-           return: 
+           return:
                   for train: B x TF x D
                   for test: TF x D
-        '''
+        """
         if not is_train:
             x = torch.unsqueeze(x, 0)
         # B x T x F -> B x T x hidden
         x, _ = self.blstm(x)
         if is_train:
-            x,_ = pad_packed_sequence(x,batch_first=True)
+            # TODO: ???
+            x, _ = pad_packed_sequence(x, batch_first=True)
         x = self.dropout(x)
 
         # B x T x hidden -> B x T x FD
